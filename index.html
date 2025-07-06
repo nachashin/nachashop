@@ -1,1 +1,152 @@
-<h1 style="font-size:400%;color:#FF0000;">It works!</h1>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <link rel="stylesheet" href="https://andybrewer.github.io/mvp/mvp.css">
+    <link href="https://fonts.googleapis.com/css?family=Zen+Maru+Gothic" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/earlyaccess/hannari.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Sawarabi+Mincho" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Sawarabi+Gothic" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Klee+One" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Hina+Mincho" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=M+PLUS+1p" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/earlyaccess/kokoro.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/earlyaccess/nikukyu.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Yuji+Syuku" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Kaisei+Opti" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Reggae+One" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Kosugi" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Kaisei+Decol" rel="stylesheet">
+    <style>
+      * {font-family:"Zen Maru Gothic";}
+      main {margin-top:-10em;}
+      h2 {color:#3333CC;font-size:240%;font-family:"Yuji Syuku";}
+      a {text-decoration:none;}
+      pre {white-space:normal;}
+      li {font-family:"Kaisei Opti";color:#666666;font-size:110%;}
+      .menu:hover {cursor:pointer;text-decoration:underline;}
+      #main_p {margin-top:-2em;margin-bottom:-2em;}
+    </style>
+    <meta charset="utf-8">
+    <meta name="description" content="nacha.shop">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="favicon.ico" />
+    <title class="title">nacha.shop</title>
+</head>
+
+<body>
+  <header>
+    <nav>
+      <ul id="links"></ul>
+    </nav>
+<!--
+    <h1 class="title">meibido.com</h1>
+    <h2 style="color:blue;">Your IP is 203.141.146.70</h2>
+//-->
+  </header>
+
+  <main id="main_id"></main>
+
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script>
+  $(function() {
+    const arealink_cols = [];
+    //const arealink_cols = ['#333333', '#663333', '#336633', '#333366', '#336666', '#663366', '#666633', '#666666', '#996666', '#666699', '#669966']; 
+    //const cols = ['00','1A','33','40','66','80','99','B3','CC','E6'];
+    const cols = ['00','1A','33','40','66','80'];
+    for ( let i = 0; i < 11; i++ ) {
+        arealink_cols.push('#'+cols[Math.floor(Math.random()*cols.length)]+cols[Math.floor(Math.random()*cols.length)]+cols[Math.floor(Math.random()*cols.length)]);
+    }
+    console.log(arealink_cols);
+
+    $.getJSON('./areas.json', function(areas) {
+
+      // 0: JSONデータ全体
+      // 下記の keys0, values0, entries0 はすべてObjectデータ
+      const keys0     = Object.keys(areas);
+      const values0   = Object.values(areas);
+      const entries0  = Object.entries(areas);
+  
+      //console.log("keys0   : "+keys0)
+      //console.log("values0 : "+values0)
+      //console.log("entries0: "+typeof(entries0))
+      
+      // 1: 各地方の各項目全体
+      const keys1     = Object.keys(keys0);
+      const values1   = Object.values(values0);
+      const entries1  = Object.entries(entries0);
+      //console.log(keys1);
+      //console.log(values1);
+      //console.log(entries1);
+      
+      // 2: 各項目ごと
+      const values2   = Object.values(values1);
+      //console.log(values2);
+      for ( let i = 0; i < values2.length; i++ ) {
+        //console.log('*** '+values2[i]["id"]+" / "+values2[i]["name"]+' ***');
+        // 上部ナビゲーションメニューに項目追加
+        $('#links').append('<li class="menu" id="arealink'+(i+1)+'">'+values2[i]["name"]+'</li>');
+        $('#arealink'+(i+1)).css({'color':arealink_cols[i]});
+
+        $('#main_id').append('<section id="area'+(i+1)+'"><header><h2>'+values2[i]["name"]+'</h2><p id="main_p">'+arealink_cols[i]+'</p></header></section>');
+        //$('#main_id').append('<section id="area'+(i+1)+'"><header><h2>'+values2[i]["name"]+'</h2></header></section>');
+
+        const keys3     = Object.keys(values2[i]["prefs"]);
+        const values3   = Object.values(values2[i]["prefs"]);
+        const entries3  = Object.entries(values2[i]["prefs"]);
+        //console.log(values3);
+        let j = 1;
+        values3.forEach((val) => {
+          const id    = val.id;
+          const name  = val.name;
+          const area_id = "area" + String(i+1);
+          const city_id = "city" + String(i+1) + "_" + String(j);
+          const forecast_id = "forecast" + String(i+1) + "_" + String(j);
+
+          const URL = 'https://www.jma.go.jp/bosai/forecast/data/overview_forecast/'+id+'.json';
+          //console.log(URL);
+
+          $('#'+area_id).append('<aside><a href="'+URL+'" target="_blank"><h3 id="city'+(i+1)+'_'+j+'"></h3></a><pre id="forecast'+(i+1)+'_'+j+'"></pre></aside>');
+          $('#'+city_id).text(name);
+          $('#'+forecast_id).text(id);
+
+          $.ajax({
+            url: URL,
+            type: 'GET',
+            cache: false,
+            dataType: 'json'
+          }).done(function(data) {
+//          $('#'+city_id).text(data['targetArea']);
+            $('#'+city_id).text(name);
+            $('#'+forecast_id).text(data['text']);
+          });
+
+          //console.log("id: "+id+" / name: "+name);
+          j++;
+        });
+      }
+
+      // 画面初期化
+      const disp_id = Math.floor(Math.random()*11)+1;
+      $('.title').text(location.hostname);
+      $('section').hide();
+      $('h2').css({'color':arealink_cols[0]});
+      $('h3').css({'color':arealink_cols[0]});
+      $('#area'+disp_id).show();
+      $('.menu').on('click', function() {
+        const id = $(this).attr('id').replace('arealink','');
+        const tgt = '#area' + id;
+        $('section').hide();
+        $('h2').css({'color':arealink_cols[id-1]});
+        $('h3').css({'color':arealink_cols[id-1]});
+        $(tgt).show();
+      });
+
+    });
+  });
+  </script>
+</body>
+</html>
+
